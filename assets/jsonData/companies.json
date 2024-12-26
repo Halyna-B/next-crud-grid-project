@@ -1,0 +1,14 @@
+[
+  {
+    "id": "company1",
+    "name": "Tech Innovators Inc.",
+    "address": "123 Silicon Valley, San Jose, CA",
+    "users": ["user1", "user3"]
+  },
+  {
+    "id": "company2",
+    "name": "Green Solutions Ltd.",
+    "address": "456 Eco Drive, Austin, TX",
+    "users": ["user1", "user2"]
+  }
+]

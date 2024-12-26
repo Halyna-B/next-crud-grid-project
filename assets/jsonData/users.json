@@ -1,0 +1,20 @@
+[
+  {
+    "id": "user1",
+    "name": "Alice Johnson",
+    "email": "alice.johnson@example.com",
+    "companies": ["company1", "company2"]
+  },
+  {
+    "id": "user2",
+    "name": "Bob Smith",
+    "email": "bob.smith@example.com",
+    "companies": ["company2"]
+  },
+  {
+    "id": "user3",
+    "name": "Carol Davis",
+    "email": "carol.davis@example.com",
+    "companies": ["company1"]
+  }
+]
