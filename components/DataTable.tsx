@@ -1,5 +1,5 @@
 "use client";
-import React, {useState} from 'react';
+import React, { useState } from "react";
 import Link from "next/link";
 
 interface Column<T> {
@@ -9,9 +9,10 @@ interface Column<T> {
 
 interface DataTableProps<T> {
     title: string;
-    data: T[];
+    data: T[] | null;
     columns: Column<T>[];
     basePath: string;
+    isLoading: boolean;
 }
 
 interface BaseRow {
@@ -19,12 +20,11 @@ interface BaseRow {
 }
 
 const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
+    const { title, data, columns, basePath, isLoading } = props;
 
-    const { title, data, columns, basePath } = props;
+    const [search, setSearch] = useState("");
 
-    const [search, setSearch] = useState('');
-
-    const filteredData = data.filter((item) =>
+    const filteredData = (data || []).filter((item) =>
         columns.some((column) =>
             item[column.accessor]?.toString().toLowerCase().includes(search.toLowerCase())
         )
@@ -52,51 +52,57 @@ const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
                             </Link>
                         </div>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full border-collapse">
-                            <thead>
-                            <tr>
-                                {columns.map((column) => (
-                                    <th
-                                        key={column.accessor.toString()}
-                                        className="px-6 py-3 border-b bg-gray-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
-                                    >
-                                        {column.header}
-                                    </th>
-                                ))}
-                            </tr>
-                            </thead>
-                            <tbody>
-                            {filteredData.length > 0 ? (
-                                filteredData.map((row, rowIndex) => (
-                                    <tr key={rowIndex} className="odd:bg-gray-50 even:bg-white">
-                                        {columns.map((column) => (
-                                            <td
-                                                key={column.accessor.toString()}
-                                                className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
-                                            >
-                                                {
-                                                    Array.isArray(row[column.accessor])
-                                                        ? (row[column.accessor] as unknown[]).join(', ')
-                                                        : row[column.accessor]?.toString()
-                                                }
-                                            </td>
-                                        ))}
-                                    </tr>
-                                ))
-                            ) : (
+                    {isLoading ? (
+                        <div className="flex justify-center items-center py-10">
+                            <div className="spinner border-t-4 border-blue-500 border-solid rounded-full w-12 h-12 animate-spin"></div>
+                        </div>
+                    ) : (
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full border-collapse">
+                                <thead>
                                 <tr>
-                                    <td
-                                        colSpan={columns.length}
-                                        className="px-6 py-4 text-center text-gray-500"
-                                    >
-                                        No results found.
-                                    </td>
+                                    {columns.map((column) => (
+                                        <th
+                                            key={column.accessor.toString()}
+                                            className="px-6 py-3 border-b bg-gray-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider"
+                                        >
+                                            {column.header}
+                                        </th>
+                                    ))}
                                 </tr>
-                            )}
-                            </tbody>
-                        </table>
-                    </div>
+                                </thead>
+                                <tbody>
+                                {filteredData.length > 0 ? (
+                                    filteredData.map((row, rowIndex) => (
+                                        <tr key={rowIndex} className="odd:bg-gray-50 even:bg-white">
+                                            {columns.map((column) => (
+                                                <td
+                                                    key={column.accessor.toString()}
+                                                    className="px-6 py-4 whitespace-nowrap text-sm text-gray-700"
+                                                >
+                                                    {
+                                                        Array.isArray(row[column.accessor])
+                                                            ? (row[column.accessor] as unknown[]).join(", ")
+                                                            : row[column.accessor]?.toString()
+                                                    }
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td
+                                            colSpan={columns.length}
+                                            className="px-6 py-4 text-center text-gray-500"
+                                        >
+                                            No results found.
+                                        </td>
+                                    </tr>
+                                )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

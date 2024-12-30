@@ -1,6 +1,7 @@
 import React, {ReactNode} from 'react';
 import '@/assets/styles/globals.css'
 
+import ReduxProvider from '../components/ReduxProvider';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -18,11 +19,13 @@ const MainLayout: React.FC<MainLayoutProps> = ({children}) => {
     return (
         <html>
         <body className="flex flex-col min-h-screen">
-        <Navbar/>
-        <main className="flex-1 bg-gray-50 overflow-auto">
-            {children}
-        </main>
-        <Footer/>
+        <ReduxProvider>
+            <Navbar/>
+            <main className="flex-1 bg-gray-50 overflow-auto">
+                {children}
+            </main>
+            <Footer/>
+        </ReduxProvider>
         </body>
         </html>
     );

@@ -1,5 +1,10 @@
+"use client";
+import { useEffect } from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { fetchCompanies } from '@/redux/companiesSlice';
+import {AppDispatch, RootState} from '@/redux/store';
+
 import DataTable from '../../components/DataTable';
-import companiesData from '../../assets/jsonData/companies.json'
 
 type Company = {
     id: string;
@@ -10,7 +15,14 @@ type Company = {
 
 const CompaniesPage = () => {
 
-    const companies: Company[] = companiesData;
+    const dispatch: AppDispatch = useDispatch();
+    const {list: companies, status} = useSelector((state: RootState) => state.companies);
+
+    useEffect(() => {
+        if (status === "idle") {
+            dispatch(fetchCompanies());
+        }
+    }, [dispatch, status]);
 
     const companyColumns = [
         { header: 'ID', accessor: 'id' as keyof Company },
@@ -19,9 +31,16 @@ const CompaniesPage = () => {
         { header: 'Users', accessor: 'users' as keyof Company },
     ];
 
+    const isCompanyListLoading = status === 'loading';
+
     return (
         <section>
-            <DataTable<Company> title='Companies Data Table' data={companies} columns={companyColumns} basePath={'companies'}/>
+            <DataTable<Company>
+                title='Company Data Table'
+                data={companies}
+                isLoading={isCompanyListLoading}
+                columns={companyColumns}
+                basePath={'companies'}/>
         </section>
     );
 };

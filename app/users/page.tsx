@@ -1,5 +1,10 @@
+"use client";
+import {useEffect} from 'react';
+import {useDispatch, useSelector} from "react-redux";
+import {fetchUsers} from '@/redux/userSlice';
+import {AppDispatch, RootState} from '@/redux/store'
+
 import DataTable from '../../components/DataTable';
-import usersData from '../../assets/jsonData/users.json'
 
 type User = {
     id: string;
@@ -10,18 +15,32 @@ type User = {
 
 const UsersPage = () => {
 
-    const users: User[] = usersData;
+    const dispatch: AppDispatch = useDispatch();
+    const {list: users, status} = useSelector((state: RootState) => state.users);
+
+    useEffect(() => {
+        if (status === "idle") {
+            dispatch(fetchUsers());
+        }
+    }, [dispatch, status]);
 
     const userColumns = [
-        { header: 'ID', accessor: 'id' as keyof User },
-        { header: 'Name', accessor: 'name' as keyof User },
-        { header: 'Email', accessor: 'email' as keyof User },
-        { header: 'Companies', accessor: 'companies' as keyof User },
+        {header: 'ID', accessor: 'id' as keyof User},
+        {header: 'Name', accessor: 'name' as keyof User},
+        {header: 'Email', accessor: 'email' as keyof User},
+        {header: 'Companies', accessor: 'companies' as keyof User},
     ];
+
+    const isUserListLoading = status === 'loading';
 
     return (
         <section className="mb-12">
-            <DataTable<User> title='Users Data Table' data={users} columns={userColumns} basePath={'users'}/>
+            <DataTable<User>
+                title='Users Data Table'
+                data={users}
+                isLoading={isUserListLoading}
+                columns={userColumns}
+                basePath={'users'}/>
         </section>
     )
 }
