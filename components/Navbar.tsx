@@ -1,9 +1,10 @@
 "use client";
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import {FaGoogle} from 'react-icons/fa';
+import {ClientSafeProvider, getProviders, signIn, useSession} from 'next-auth/react';
 
 import {ListItem} from './ListItem';
 import profileImage from '../assets/images/profile.png'
@@ -12,9 +13,24 @@ import logoImage from '../assets/images/logo.png'
 
 const Navbar = () => {
 
+    const {data: session} = useSession();
+
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
-    const [isLoggedIn, setIsLoggedIn] = useState(true);
+    const [authProviders, setAuthProviders] = useState<Record<string, ClientSafeProvider> | null>(null);
+
+    useEffect(() => {
+        const fetchAuthProviders = async () => {
+            try {
+                const res = await getProviders();
+                setAuthProviders(res);
+            } catch (error) {
+                console.error("Error fetching providers:", error);
+            }
+        };
+
+        fetchAuthProviders();
+    }, []);
 
     return (
         <nav className="bg-white border-gray-200 dark:bg-gray-900 shadow-md">
@@ -25,15 +41,19 @@ const Navbar = () => {
                         className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">UserCoHub</span>
                 </Link>
                 <div className="flex items-center gap-2 md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                    {!isLoggedIn && (
-                        <button
-                            className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
-                        >
-                            <FaGoogle className='text-white mr-2'/>
-                            <span>Login or Register</span>
-                        </button>
-                    )}
-                    {isLoggedIn && (
+                    {!session &&
+                        authProviders &&
+                        Object.values(authProviders).map((provider) => (
+                            <button
+                                key={provider.id}
+                                className="flex items-center text-white bg-gray-700 hover:bg-gray-900 hover:text-white rounded-md px-3 py-2"
+                                onClick={() => signIn(provider.id)}
+                            >
+                                <FaGoogle className="text-white mr-2"/>
+                                <span>Login with {provider.name}</span>
+                            </button>
+                        ))}
+                    {session && (
                         <div className="relative ml-3">
                             <button type="button"
                                     className="flex text-sm bg-gray-800 rounded-full md:me-0 focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
