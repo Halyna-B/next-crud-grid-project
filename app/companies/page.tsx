@@ -7,7 +7,7 @@ import {AppDispatch, RootState} from '@/redux/store';
 import DataTable from '../../components/DataTable';
 
 type Company = {
-    id: string;
+    _id: string;
     name: string;
     address: string;
     users: string[];
@@ -25,7 +25,7 @@ const CompaniesPage = () => {
     }, [dispatch, status]);
 
     const companyColumns = [
-        { header: 'ID', accessor: 'id' as keyof Company },
+        { header: 'ID', accessor: '_id' as keyof Company },
         { header: 'Name', accessor: 'name' as keyof Company },
         { header: 'Address', accessor: 'address' as keyof Company },
         { header: 'Users', accessor: 'users' as keyof Company },

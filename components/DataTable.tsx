@@ -16,7 +16,7 @@ interface DataTableProps<T> {
 }
 
 interface BaseRow {
-    id: string;
+    _id: string;
 }
 
 const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
