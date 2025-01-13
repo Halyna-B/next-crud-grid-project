@@ -10,10 +10,10 @@ interface UserRequestBody {
     companies: string[];
 }
 
-// GET Request - Fetch all users
 export async function GET() {
     try {
         const users = await User.find().lean();
+
         return NextResponse.json(users, { status: 200 });
     } catch (error: unknown) {
         console.error("Error fetching users:", error);
@@ -24,7 +24,6 @@ export async function GET() {
     }
 }
 
-// POST Request - Create a new user
 export async function POST(req: Request) {
     try {
         const body: UserRequestBody = await req.json();

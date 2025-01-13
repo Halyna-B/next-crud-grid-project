@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 import Select, { MultiValue } from 'react-select';
-import * as Yup from 'yup';
 import { toast} from 'react-toastify';
+import * as Yup from 'yup';
 
-interface Company {
+interface User {
     _id: string;
     name: string;
 }
 
-interface UserFormValues {
+interface CompanyFormValues {
     name: string;
-    email: string;
-    companies: string[];
+    address: string;
+    users: string[];
 }
 
 interface SelectOption {
@@ -20,14 +20,14 @@ interface SelectOption {
     label: string;
 }
 
-interface UserFormProps {
-    initialValues: UserFormValues;
-    onSubmit: (values: UserFormValues) => Promise<void>;
+interface CompanyFormProps {
+    initialValues: CompanyFormValues;
+    onSubmit: (values: CompanyFormValues) => Promise<void>;
     isLoading: boolean;
-    companies: Company[];
+    users: User[];
 }
 
-const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading, companies }) => {
+const CompanyForm: React.FC<CompanyFormProps> = ({ initialValues, onSubmit, isLoading, users }) => {
     const [isClient, setIsClient] = useState(false);
 
 
@@ -36,9 +36,9 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
     }, []);
 
 
-    const companyOptions: SelectOption[] = companies.map((company) => ({
-        value: company._id,
-        label: company.name,
+    const usersOptions: SelectOption[] = users.map((user) => ({
+        value: user._id,
+        label: user.name,
     }));
 
     if (!isClient) {
@@ -50,8 +50,8 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
             initialValues={initialValues}
             validationSchema={Yup.object({
                 name: Yup.string().required('Name is required').min(2, 'Name must be at least 2 characters').max(50, 'Name can be up to 50 characters'),
-                email: Yup.string().email('Invalid email address').required('Email is required'),
-                companies: Yup.array().required('At least one company is required'),
+                address: Yup.string().required('Address is required').min(5, 'Address is too short').max(100, 'Address is too long'),
+                users: Yup.array().required('At least one user is required'),
             })}
             onSubmit={async (values, { resetForm }) => {
                 try {
@@ -83,38 +83,38 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
                     </div>
 
                     <div className="flex flex-col">
-                        <label htmlFor="email" className="text-lg font-semibold text-gray-700">
-                            Email
+                        <label htmlFor="address" className="text-lg font-semibold text-gray-700">
+                            Address
                         </label>
                         <Field
-                            type="email"
-                            name="email"
-                            id="email"
+                            type="text"
+                            name="address"
+                            id="address"
                             className="input-field"
-                            placeholder="Enter your email"
+                            placeholder="Enter a company address"
                         />
-                        {touched.email && errors.email && (
-                            <div className="text-red-500 text-sm">{errors.email}</div>
+                        {touched.address && errors.address && (
+                            <div className="text-red-500 text-sm">{errors.address}</div>
                         )}
                     </div>
 
                     <div className="flex flex-col">
-                        <label htmlFor="companies" className="text-lg font-semibold text-gray-700">
-                            Select Companies
+                        <label htmlFor="users" className="text-lg font-semibold text-gray-700">
+                            Select User
                         </label>
                         <Select
                             isMulti
-                            options={companyOptions}
-                            value={companyOptions.filter((option) =>
-                                values.companies.includes(option.label)
+                            options={usersOptions}
+                            value={usersOptions.filter((option) =>
+                                values.users.includes(option.label)
                             )}
                             onChange={(newValue: MultiValue<SelectOption>) => {
                                 const selectedValues = newValue.map(
                                     (option) => option.label
                                 );
-                                setFieldValue('companies', selectedValues);
+                                setFieldValue('users', selectedValues);
                             }}
-                            placeholder="Select companies"
+                            placeholder="Select users"
                             classNamePrefix="react-select"
                             styles={{
                                 control: (base) => ({
@@ -127,8 +127,8 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
                                 }),
                             }}
                         />
-                        {touched.companies && errors.companies && (
-                            <div className="text-red-500 text-sm">{errors.companies}</div>
+                        {touched.users && errors.users && (
+                            <div className="text-red-500 text-sm">{errors.users}</div>
                         )}
                     </div>
 
@@ -145,4 +145,4 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
     );
 };
 
-export default UserForm;
+export default CompanyForm;

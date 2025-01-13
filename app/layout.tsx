@@ -1,4 +1,5 @@
 import React, {ReactNode} from 'react';
+import { ToastContainer } from 'react-toastify';
 import '@/assets/styles/globals.css'
 
 import ReduxProvider from '../components/ReduxProvider';
@@ -23,6 +24,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({children}) => {
             <body className="flex flex-col min-h-screen">
             <ReduxProvider>
                 <Navbar/>
+                <ToastContainer />
                 <main className="flex-1 bg-gray-50 overflow-auto">
                     {children}
                 </main>

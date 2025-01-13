@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompanies } from '@/redux/companiesSlice';
 import { AppDispatch, RootState } from '@/redux/store';
-import { createUser } from '@/redux/userSlice';  // Import the createUser action
+import { createUser } from '@/redux/userSlice';
 import UserForm from '@/components/UserForm';
 
 const AddUserPage = () => {
