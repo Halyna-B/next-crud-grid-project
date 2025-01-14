@@ -68,3 +68,35 @@ export async function PUT(req: Request, context: { params: { id: string } }) {
     }
 }
 
+export async function DELETE(req: Request, context: { params: { id: string } }) {
+    try {
+        const { id } = await context.params;
+
+        if (!id) {
+            return NextResponse.json(
+                { message: "User ID is required for deletion" },
+                { status: 400 }
+            );
+        }
+
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        if (!deletedUser) {
+            return NextResponse.json(
+                { message: "User not found" },
+                { status: 404 }
+            );
+        }
+
+        return NextResponse.json(
+            { message: "User deleted successfully", user: deletedUser },
+            { status: 200 }
+        );
+    } catch (error: unknown) {
+        console.error("Error deleting user:", error);
+        return NextResponse.json(
+            { message: "Error deleting user", error: error instanceof Error ? error.message : "Unknown error" },
+            { status: 500 }
+        );
+    }
+}

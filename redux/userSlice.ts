@@ -26,9 +26,22 @@ export const fetchUserById = createAsyncThunk("users/fetchUserById", async (id: 
 
 export const updateUser = createAsyncThunk(
     'users/updateUser',
-    async ({ _id, name, email, companies }: { _id: string; name: string; email: string; companies: string[] }) => {
-        const response = await axios.put(`/api/users/${_id}`, { name, email, companies }); // API route for updating user
+    async ({_id, name, email, companies}: { _id: string; name: string; email: string; companies: string[] }) => {
+        const response = await axios.put(`/api/users/${_id}`, {name, email, companies}); // API route for updating user
         return response.data;
+    }
+);
+
+export const deleteUser = createAsyncThunk(
+    "users/deleteUser",
+    async (id: string, { rejectWithValue }) => {
+        try {
+            const response = await axios.delete(`/api/users/${id}`);
+            return response.data;
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (error) {
+            return rejectWithValue("Failed to delete user.");
+        }
     }
 );
 
@@ -107,6 +120,13 @@ const usersSlice = createSlice({
             })
             .addCase(updateUser.rejected, (state, action) => {
                 state.status = "failed";
+                state.error = action.payload as string;
+            })
+            // Delete user
+            .addCase(deleteUser.fulfilled, (state, action) => {
+                state.list = state.list.filter((user) => user._id !== action.payload._id);
+            })
+            .addCase(deleteUser.rejected, (state, action) => {
                 state.error = action.payload as string;
             });
     },

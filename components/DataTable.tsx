@@ -14,6 +14,7 @@ interface DataTableProps<T> {
     columns: Column<T>[];
     basePath: string;
     isLoading: boolean;
+    onDelete?: (id: string) => Promise<void>;
 }
 
 interface BaseRow {
@@ -21,9 +22,25 @@ interface BaseRow {
 }
 
 const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
-    const { title, data, columns, basePath, isLoading } = props;
+    const { title, data, columns, basePath, isLoading, onDelete } = props;
 
     const [search, setSearch] = useState('');
+    const [deletingId, setDeletingId] = useState<string | null>(null);
+
+    const handleDelete = async (id: string) => {
+        if (!onDelete) return;
+
+        if (confirm("Are you sure you want to delete this item?")) {
+            setDeletingId(id);
+            try {
+                await onDelete(id);
+            } catch (error) {
+                console.error("Error deleting item:", error);
+            } finally {
+                setDeletingId(null);
+            }
+        }
+    };
 
     const filteredData = (data || []).filter((item) =>
         columns.some((column) =>
@@ -96,11 +113,21 @@ const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
                                                 >
                                                     <FaEdit className="w-5 h-5" />
                                                 </Link>
-                                                <button
-                                                    className="text-red-500 hover:text-red-700"
-                                                >
-                                                    <FaTrashAlt className="w-5 h-5" />
-                                                </button>
+                                                {onDelete && (
+                                                    <button
+                                                        className={`text-red-500 hover:text-red-700 ${
+                                                            deletingId === row._id ? "opacity-50 cursor-not-allowed" : ""
+                                                        }`}
+                                                        onClick={() => handleDelete(row._id)}
+                                                        disabled={deletingId === row._id}
+                                                    >
+                                                        {deletingId === row._id ? (
+                                                            <div className="spinner border-t-2 border-red-500 border-solid rounded-full w-4 h-4 animate-spin" />
+                                                        ) : (
+                                                            <FaTrashAlt className="w-5 h-5" />
+                                                        )}
+                                                    </button>
+                                                )}
                                             </td>
                                         </tr>
                                     ))

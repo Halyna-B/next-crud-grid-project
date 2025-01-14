@@ -1,10 +1,11 @@
 "use client";
 import {useEffect} from 'react';
 import {useDispatch, useSelector} from "react-redux";
-import {fetchUsers} from '@/redux/userSlice';
+import {deleteUser, fetchUsers} from '@/redux/userSlice';
 import {AppDispatch, RootState} from '@/redux/store'
 
 import DataTable from '../../components/DataTable';
+import {toast} from "react-toastify";
 
 type User = {
     _id: string;
@@ -31,6 +32,16 @@ const UsersPage = () => {
         {header: 'Companies', accessor: 'companies' as keyof User},
     ];
 
+    const handleDelete = async (id: string) => {
+        try {
+            await dispatch(deleteUser(id)).unwrap();
+            toast.success("User deleted successfully.");
+            await dispatch(fetchUsers());
+        } catch (error) {
+            toast.error(`Failed to delete user: ${error}`);
+        }
+    };
+
     const isUserListLoading = status === 'loading';
 
     return (
@@ -40,7 +51,9 @@ const UsersPage = () => {
                 data={users}
                 isLoading={isUserListLoading}
                 columns={userColumns}
-                basePath={'users'}/>
+                basePath={'users'}
+                onDelete={handleDelete}
+            />
         </section>
     )
 }
