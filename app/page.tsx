@@ -1,7 +1,21 @@
+"use client";
+import {useEffect} from 'react';
+
+import {useDispatch} from 'react-redux';
+import {AppDispatch} from '@/redux/store';
+import {fetchUsers} from '@/redux/userSlice';
+import {fetchCompanies} from '@/redux/companiesSlice';
 import BarChart from '../components/BarChart';
 import PieChart from '../components/PieChart';
 
 const HomePage = () => {
+
+    const dispatch = useDispatch<AppDispatch>();
+
+    useEffect(() => {
+        dispatch(fetchUsers());
+        dispatch(fetchCompanies());
+    }, [dispatch]);
     return (
         <div className="p-6">
             <div className="max-w-6xl mx-auto">

@@ -19,14 +19,29 @@ export const createUser = createAsyncThunk(
     }
 );
 
+export const fetchUserById = createAsyncThunk("users/fetchUserById", async (id: string) => {
+    const response = await axios.get(`/api/users/${id}`);
+    return response.data;
+});
+
+export const updateUser = createAsyncThunk(
+    'users/updateUser',
+    async ({ _id, name, email, companies }: { _id: string; name: string; email: string; companies: string[] }) => {
+        const response = await axios.put(`/api/users/${_id}`, { name, email, companies }); // API route for updating user
+        return response.data;
+    }
+);
+
 interface UsersState {
     list: { _id: string; name: string; email: string; companies: string[] }[];
+    currentUser: { _id: string; name: string; email: string; companies: string[] } | null;
     status: 'idle' | 'loading' | 'succeeded' | 'failed';
     error: string | null;
 }
 
 const initialState: UsersState = {
     list: [],
+    currentUser: null,
     status: 'idle',
     error: null,
 };
@@ -48,15 +63,49 @@ const usersSlice = createSlice({
             .addCase(fetchUsers.rejected, (state) => {
                 state.status = "failed";
             })
+
+            // Fetch user by ID
+            .addCase(fetchUserById.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(fetchUserById.fulfilled, (state, action) => {
+                state.currentUser = action.payload;
+                state.status = "succeeded";
+            })
+            .addCase(fetchUserById.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload as string;
+            })
+
             // Create user
             .addCase(createUser.pending, (state) => {
                 state.status = "loading";
             })
             .addCase(createUser.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.list.push(action.payload);
+                state.list.push(action.payload); // Add the newly created user to the list
             })
             .addCase(createUser.rejected, (state, action) => {
+                state.status = "failed";
+                state.error = action.payload as string;
+            })
+
+            // Update user
+            .addCase(updateUser.pending, (state) => {
+                state.status = "loading";
+            })
+            .addCase(updateUser.fulfilled, (state, action) => {
+                state.status = "succeeded";
+                const index = state.list.findIndex((user) => user._id === action.payload._id);
+                if (index !== -1) {
+                    state.list[index] = action.payload;
+                }
+
+                if (state.currentUser && state.currentUser._id === action.payload._id) {
+                    state.currentUser = action.payload;
+                }
+            })
+            .addCase(updateUser.rejected, (state, action) => {
                 state.status = "failed";
                 state.error = action.payload as string;
             });
@@ -64,4 +113,5 @@ const usersSlice = createSlice({
 });
 
 export default usersSlice.reducer;
+
 

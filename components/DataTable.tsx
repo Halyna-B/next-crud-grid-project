@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import { FaEdit, FaTrashAlt } from "react-icons/fa";
 
 interface Column<T> {
     header: string;
@@ -22,7 +23,7 @@ interface BaseRow {
 const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
     const { title, data, columns, basePath, isLoading } = props;
 
-    const [search, setSearch] = useState("");
+    const [search, setSearch] = useState('');
 
     const filteredData = (data || []).filter((item) =>
         columns.some((column) =>
@@ -69,6 +70,7 @@ const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
                                             {column.header}
                                         </th>
                                     ))}
+                                    <th className="px-6 py-3 border-b bg-gray-100 text-left text-sm font-medium text-gray-600 uppercase tracking-wider" />
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -87,12 +89,25 @@ const DataTable = <T extends BaseRow>(props: DataTableProps<T>) => {
                                                     }
                                                 </td>
                                             ))}
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 flex space-x-4">
+                                                <Link
+                                                    href={`/${basePath}/${row._id}`}
+                                                    className="text-blue-500 hover:text-blue-700"
+                                                >
+                                                    <FaEdit className="w-5 h-5" />
+                                                </Link>
+                                                <button
+                                                    className="text-red-500 hover:text-red-700"
+                                                >
+                                                    <FaTrashAlt className="w-5 h-5" />
+                                                </button>
+                                            </td>
                                         </tr>
                                     ))
                                 ) : (
                                     <tr>
                                         <td
-                                            colSpan={columns.length}
+                                            colSpan={columns.length + 1}
                                             className="px-6 py-4 text-center text-gray-500"
                                         >
                                             No results found.

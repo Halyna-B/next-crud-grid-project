@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Field, Form, Formik } from 'formik';
 import Select, { MultiValue } from 'react-select';
+import { toast } from 'react-toastify';
 import * as Yup from 'yup';
-import { toast} from 'react-toastify';
+
 
 interface Company {
     _id: string;
     name: string;
 }
 
-interface UserFormValues {
+export interface UserFormValues {
     name: string;
     email: string;
     companies: string[];
@@ -30,7 +31,6 @@ interface UserFormProps {
 const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading, companies }) => {
     const [isClient, setIsClient] = useState(false);
 
-
     useEffect(() => {
         setIsClient(true);
     }, []);
@@ -41,6 +41,12 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
         label: company.name,
     }));
 
+     const mapCompanyNamesToOptions = (companyNames: string[]): SelectOption[] => {
+        return companyNames
+            .map((companyName) => companyOptions.find((option) => option.label === companyName))
+            .filter(Boolean) as SelectOption[];
+    };
+
     if (!isClient) {
         return null;
     }
@@ -49,15 +55,17 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
         <Formik
             initialValues={initialValues}
             validationSchema={Yup.object({
-                name: Yup.string().required('Name is required').min(2, 'Name must be at least 2 characters').max(50, 'Name can be up to 50 characters'),
+                name: Yup.string()
+                    .required('Name is required')
+                    .min(2, 'Name must be at least 2 characters')
+                    .max(50, 'Name can be up to 50 characters'),
                 email: Yup.string().email('Invalid email address').required('Email is required'),
-                companies: Yup.array().required('At least one company is required'),
+                companies: Yup.array().min(1, 'At least one company is required').required('At least one company is required'),
             })}
             onSubmit={async (values, { resetForm }) => {
                 try {
                     await onSubmit(values);
                     resetForm();
-                    toast.success('Form submitted successfully!');
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
                     toast.error('Submission failed, please try again');
@@ -105,13 +113,9 @@ const UserForm: React.FC<UserFormProps> = ({ initialValues, onSubmit, isLoading,
                         <Select
                             isMulti
                             options={companyOptions}
-                            value={companyOptions.filter((option) =>
-                                values.companies.includes(option.label)
-                            )}
+                            value={mapCompanyNamesToOptions(values.companies)}
                             onChange={(newValue: MultiValue<SelectOption>) => {
-                                const selectedValues = newValue.map(
-                                    (option) => option.label
-                                );
+                                const selectedValues = newValue.map((option) => option.label);
                                 setFieldValue('companies', selectedValues);
                             }}
                             placeholder="Select companies"

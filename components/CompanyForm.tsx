@@ -51,7 +51,7 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ initialValues, onSubmit, isLo
             validationSchema={Yup.object({
                 name: Yup.string().required('Name is required').min(2, 'Name must be at least 2 characters').max(50, 'Name can be up to 50 characters'),
                 address: Yup.string().required('Address is required').min(5, 'Address is too short').max(100, 'Address is too long'),
-                users: Yup.array().required('At least one user is required'),
+                users: Yup.array().min(1, 'At least one user is required').required('At least one user is required'),
             })}
             onSubmit={async (values, { resetForm }) => {
                 try {

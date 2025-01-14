@@ -2,10 +2,12 @@
 
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
 import { fetchCompanies } from '@/redux/companiesSlice';
 import { AppDispatch, RootState } from '@/redux/store';
 import { createUser } from '@/redux/userSlice';
 import UserForm from '@/components/UserForm';
+
 
 const AddUserPage = () => {
     const dispatch: AppDispatch = useDispatch();
@@ -27,15 +29,13 @@ const AddUserPage = () => {
             setSubmissionError(null);
 
             await dispatch(createUser(values));
-
+            toast.success('User created successfully!');
             if (userStatus === 'failed') {
                 setSubmissionError(error || 'An error occurred');
-            } else {
-                console.log('User created successfully');
             }
         } catch (error) {
             setSubmissionError('An error occurred while creating the user');
-            console.error('Error creating user:', error);
+            toast.error(`Error creating user: ${error}`);
         } finally {
             setIsSubmitting(false);
         }
