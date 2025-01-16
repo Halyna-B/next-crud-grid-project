@@ -1,10 +1,12 @@
 "use client";
 import { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { fetchCompanies } from '@/redux/companiesSlice';
+import { deleteCompany, fetchCompanies} from '@/redux/companiesSlice';
 import {AppDispatch, RootState} from '@/redux/store';
 
 import DataTable from '../../components/DataTable';
+
+import {toast} from "react-toastify";
 
 type Company = {
     _id: string;
@@ -31,6 +33,16 @@ const CompaniesPage = () => {
         { header: 'Users', accessor: 'users' as keyof Company },
     ];
 
+    const handleDelete = async (id: string) => {
+        try {
+            await dispatch(deleteCompany(id)).unwrap();
+            toast.success("Company deleted successfully.");
+            await dispatch(fetchCompanies());
+        } catch (error) {
+            toast.error(`Failed to delete company: ${error}`);
+        }
+    };
+
     const isCompanyListLoading = status === 'loading';
 
     return (
@@ -40,7 +52,9 @@ const CompaniesPage = () => {
                 data={companies}
                 isLoading={isCompanyListLoading}
                 columns={companyColumns}
-                basePath={'companies'}/>
+                basePath={'companies'}
+                onDelete={handleDelete}
+            />
         </section>
     );
 };

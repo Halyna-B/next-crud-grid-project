@@ -27,7 +27,7 @@ export const fetchUserById = createAsyncThunk("users/fetchUserById", async (id: 
 export const updateUser = createAsyncThunk(
     'users/updateUser',
     async ({_id, name, email, companies}: { _id: string; name: string; email: string; companies: string[] }) => {
-        const response = await axios.put(`/api/users/${_id}`, {name, email, companies}); // API route for updating user
+        const response = await axios.put(`/api/users/${_id}`, {name, email, companies});
         return response.data;
     }
 );
@@ -96,7 +96,7 @@ const usersSlice = createSlice({
             })
             .addCase(createUser.fulfilled, (state, action) => {
                 state.status = "succeeded";
-                state.list.push(action.payload); // Add the newly created user to the list
+                state.list.push(action.payload);
             })
             .addCase(createUser.rejected, (state, action) => {
                 state.status = "failed";

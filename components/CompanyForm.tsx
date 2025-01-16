@@ -9,7 +9,7 @@ interface User {
     name: string;
 }
 
-interface CompanyFormValues {
+export interface CompanyFormValues {
     name: string;
     address: string;
     users: string[];
@@ -36,10 +36,16 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ initialValues, onSubmit, isLo
     }, []);
 
 
-    const usersOptions: SelectOption[] = users.map((user) => ({
+    const userOptions: SelectOption[] = users.map((user) => ({
         value: user._id,
         label: user.name,
     }));
+
+    const mapUserNamesToOptions = (userNames: string[]): SelectOption[] => {
+        return userNames
+            .map((userName) => userOptions.find((option) => option.label === userName))
+            .filter(Boolean) as SelectOption[];
+    };
 
     if (!isClient) {
         return null;
@@ -57,7 +63,6 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ initialValues, onSubmit, isLo
                 try {
                     await onSubmit(values);
                     resetForm();
-                    toast.success('Form submitted successfully!');
                     // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 } catch (error) {
                     toast.error('Submission failed, please try again');
@@ -104,14 +109,10 @@ const CompanyForm: React.FC<CompanyFormProps> = ({ initialValues, onSubmit, isLo
                         </label>
                         <Select
                             isMulti
-                            options={usersOptions}
-                            value={usersOptions.filter((option) =>
-                                values.users.includes(option.label)
-                            )}
+                            options={userOptions}
+                            value={mapUserNamesToOptions(values.users)}
                             onChange={(newValue: MultiValue<SelectOption>) => {
-                                const selectedValues = newValue.map(
-                                    (option) => option.label
-                                );
+                                const selectedValues = newValue.map((option) => option.label);
                                 setFieldValue('users', selectedValues);
                             }}
                             placeholder="Select users"
